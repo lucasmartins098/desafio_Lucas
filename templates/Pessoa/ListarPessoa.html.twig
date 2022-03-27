@@ -38,7 +38,7 @@
                                 <td>  {{pessoa.Estado}}  </td> 
                                 <td>  {{pessoa.Cidade}}  </td> 
                                 <td>  
-                                        <button type="button" class="btn btn-warning">
+                                        <button type="button" class="btn btn-warning" onclick="EditarPessoa({{pessoa.Id}})">
                                                 <span class="glyphicon glyphicon-open-file" aria-hidden="true"></span>
                                         </button> 
                                 </td> 
@@ -71,6 +71,10 @@
                         console.log(response);
                     }
                 });
+        }
+
+        function EditarPessoa(id){
+                window.location.href = "/CarregarDadosPessoa/"+id;
         }
 
   </script>

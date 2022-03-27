@@ -76,8 +76,86 @@ class PessoaController extends AbstractController
     {
         try
         {
-            $categoria = $pessoaRepository->find($id);
-            $entityManagerInterface->remove($categoria);
+            $pessoa = $pessoaRepository->find($id);
+            $entityManagerInterface->remove($pessoa);
+            $entityManagerInterface->flush();
+
+           return $this->json("Success: 'True'");
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/CarregarDadosPessoa/{id}", name="CarregarDadosPessoa")
+     */
+    public function CarregarDadosPessoa(int $id, PessoaRepository $pessoaRepository): Response
+    {
+        $data['titulo'] = 'Listar Pessoa';
+        try
+        {
+           $data['pessoa'] = $pessoaRepository->find($id);
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+
+        return $this->renderForm('Pessoa/CarregarDadosPessoa.html.twig', $data);
+    }
+
+     /**
+     * @Route("/Update/{id}", name="Update")
+     */
+    public function Update(int $id, Pessoa $pessoa, Request $request, EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
+    {
+        try
+        {
+            $pessoaEstadoAtualDoObjeto = $pessoaRepository->find($id);
+
+            if($pessoaEstadoAtualDoObjeto->getNome() != $request->request->get('nome'))
+            {
+                $pessoa->setNome($request->request->get('nome'));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getCPF() != $request->request->get('cpf'))
+            {
+                $pessoa->setCPF($request->request->get('cpf'));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getDataNascimento() != (new \DateTime($request->request->get('dataNascimento'))))
+            {
+                $pessoa->setDataNascimento(new \DateTime($request->request->get('dataNascimento')));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getEmail() != $request->request->get('email'))
+            {
+                $pessoa->setEmail($request->request->get('email'));
+            }
+
+            if($pessoaEstadoAtualDoObjeto->getTelefone() != $request->request->get('telefone'))
+            {
+                $pessoa->setTelefone($request->request->get('telefone'));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getLogradouro() != $request->request->get('logradouro'))
+            {
+                $pessoa->setLogradouro($request->request->get('logradouro'));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getCidade() != $request->request->get('cidade'))
+            {
+                $pessoa->setCidade($request->request->get('cidade'));
+            }
+            
+            if($pessoaEstadoAtualDoObjeto->getEstado() != $request->request->get('estado'))
+            {
+                $pessoa->setEstado($request->request->get('estado'));
+            }
+            
+            $entityManagerInterface->persist($pessoa);
             $entityManagerInterface->flush();
 
            return $this->json("Success: 'True'");
