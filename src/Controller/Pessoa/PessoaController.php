@@ -14,9 +14,9 @@ use App\Repository\PessoaRepository;
 class PessoaController extends AbstractController
 {
     /**
-     * @Route("/", name="pessoa")
+     * @Route("/CadastrarPessoa", name="CadastrarPessoa")
      */
-    public function index(): Response
+    public function CadastrarPessoa(): Response
     {
         $data['titulo'] = 'Adicionar nova Pessoa';
         
@@ -52,19 +52,39 @@ class PessoaController extends AbstractController
     }
 
     /**
-     * @Route("/Listar", name="Listar")
+     * @Route("/ListarPessoas", name="ListarPessoas")
      */
-    public function Listar(EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
+    public function ListPessoas(PessoaRepository $pessoaRepository): Response
+    {
+        $data['titulo'] = 'Listar Pessoas';
+        try
+        {
+           $data['pessoas'] = $pessoaRepository->findAll();
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+
+        return $this->renderForm('Pessoa/ListarPessoa.html.twig', $data);
+    }
+
+    /**
+     * @Route("/Delete/{id}", name="Create")
+     */
+    public function Delete(int $id, EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
     {
         try
         {
-           $pessoa = $pessoaRepository->findAll();
-           return $this->json($pessoa);
+            $categoria = $pessoaRepository->find($id);
+            $entityManagerInterface->remove($categoria);
+            $entityManagerInterface->flush();
+
+           return $this->json("Success: 'True'");
         }
         catch(Exception $exception)
         {
             return $this->json($exception->getMessage());
         }
     }
-
 }
