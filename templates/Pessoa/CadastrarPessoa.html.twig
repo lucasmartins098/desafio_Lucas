@@ -1,7 +1,123 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Página Inicial{% endblock %}
+{% block title %}Página Inicial
+{% endblock %}
 
 {% block body %}
-<h1> Olá </h1>
-{% endblock %}
+	<h1>
+		Olá
+	</h1>
+
+    <form id='form' >
+</br>
+        <label>Nome:</label>
+        <input type="text" id="nome">
+
+</br>
+        <label>CPF:</label>
+        <input type="text" id="cpf">
+
+</br>
+        <label>Data de Nascimento</label>
+        <input type="text" id="dataNascimento">
+
+</br>
+        <label>Email</label>
+        <input type="text" id="email">
+
+</br>
+        <label>Telefone</label>        
+        <input type="text" id="telefone">
+
+</br>
+        <label>Logradouro</label>        
+        <input type="text" id="logradouro">
+
+</br>
+        <label>Estado</label>
+        <select id="estado" onchange="BuscarMunicipios()">
+        </select>
+
+</br>
+        <label>Cidade</label>
+         <select id="cidade">
+        </select>
+
+</br>
+        <input type="button" onclick="Enviar()" value="Enviar">
+
+    </form>
+
+    
+    {% endblock %}
+    {% block javascript %}
+
+    {{ parent() }}
+
+  <script type="text/javascript">
+
+    function Enviar() {
+        var nome = $("#nome").val();
+        var cpf = $("#cpf").val();
+        var dataNascimento = $("#dataNascimento").val();
+        var email = $("#email").val();
+        var telefone = $("#telefone").val();
+        var logradouro = $("#logradouro").val();
+        var cidade = $("#cidade").val();
+        var estado = $( "#estado option:selected" ).text();
+
+                $.ajax({  
+                    type: "POST",  
+                    url: '/Create',
+                    data: {
+                        nome: nome,
+                        cpf: cpf,
+                        email: email,
+                        dataNascimento:dataNascimento,
+                        telefone: telefone,
+                        logradouro:logradouro,
+                        cidade: cidade,
+                        estado: estado,
+                    },
+                    success: function(response)
+                    {
+                        console.log(response);
+                    }
+                });
+        }
+
+        $(document).ready(function() {
+            BuscarEstados();
+        });
+
+        function BuscarMunicipios(){
+            let municipioSelect = document.querySelector('#cidade');
+
+            var estadoId = $("#estado").val();
+            $("#cidade").empty();
+
+            fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados/"+ estadoId +"/municipios")
+                .then( res => res.json())
+                .then( municipios => {
+                for( const municipio of municipios ) {
+                    municipioSelect.innerHTML += `<option value="${municipio.nome}">${municipio.nome}</option>`
+                }
+                });
+        }
+
+        function BuscarEstados(){
+
+            let ufSelect = document.querySelector('#estado');
+            
+            fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome")
+                .then( res => res.json())
+                .then( estados => {
+                for( const estado of estados ) {
+                    ufSelect.innerHTML += `<option value="${estado.id}">${estado.nome}</option>`
+                }
+                });
+        }
+
+  </script>
+
+  {% endblock %}
