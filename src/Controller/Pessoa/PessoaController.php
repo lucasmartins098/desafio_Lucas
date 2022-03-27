@@ -18,9 +18,7 @@ class PessoaController extends AbstractController
      */
     public function CadastrarPessoa(): Response
     {
-        $data['titulo'] = 'Adicionar nova Pessoa';
-        
-        return $this->renderForm('Pessoa/CadastrarPessoa.html.twig', $data);
+        return $this->renderForm('Pessoa/CadastrarPessoa.html.twig');
     }
 
     /**
@@ -52,11 +50,10 @@ class PessoaController extends AbstractController
     }
 
     /**
-     * @Route("/ListarPessoas", name="ListarPessoas")
+     * @Route("/", name="ListarPessoas")
      */
     public function ListPessoas(PessoaRepository $pessoaRepository): Response
     {
-        $data['titulo'] = 'Listar Pessoas';
         try
         {
            $data['pessoas'] = $pessoaRepository->findAll();
@@ -70,7 +67,7 @@ class PessoaController extends AbstractController
     }
 
     /**
-     * @Route("/Delete/{id}", name="Create")
+     * @Route("/Delete/{id}", name="Delete")
      */
     public function Delete(int $id, EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
     {
