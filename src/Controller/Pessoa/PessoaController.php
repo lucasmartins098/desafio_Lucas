@@ -9,8 +9,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use App\Repository\PessoaRepository;
 
-class CadastroPessoaController extends AbstractController
+class PessoaController extends AbstractController
 {
     /**
      * @Route("/", name="pessoa")
@@ -23,11 +24,10 @@ class CadastroPessoaController extends AbstractController
     }
 
     /**
-     * @Route("/Create", name="adcionar")
+     * @Route("/Create", name="Create")
      */
     public function Create(Request $request, EntityManagerInterface $entityManagerInterface) : Response
     {
-        
         try
         {
             $pessoa = new Pessoa();
@@ -50,4 +50,21 @@ class CadastroPessoaController extends AbstractController
             return $this->json($exception->getMessage());
         }
     }
+
+    /**
+     * @Route("/Listar", name="Listar")
+     */
+    public function Listar(EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
+    {
+        try
+        {
+           $pessoa = $pessoaRepository->findAll();
+           return $this->json($pessoa);
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+    }
+
 }
