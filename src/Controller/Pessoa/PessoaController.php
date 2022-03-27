@@ -9,13 +9,14 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use App\Repository\PessoaRepository;
 
-class CadastroPessoaController extends AbstractController
+class PessoaController extends AbstractController
 {
     /**
-     * @Route("/", name="pessoa")
+     * @Route("/CadastrarPessoa", name="CadastrarPessoa")
      */
-    public function index(): Response
+    public function CadastrarPessoa(): Response
     {
         $data['titulo'] = 'Adicionar nova Pessoa';
         
@@ -23,11 +24,10 @@ class CadastroPessoaController extends AbstractController
     }
 
     /**
-     * @Route("/Create", name="adcionar")
+     * @Route("/Create", name="Create")
      */
     public function Create(Request $request, EntityManagerInterface $entityManagerInterface) : Response
     {
-        
         try
         {
             $pessoa = new Pessoa();
@@ -41,6 +41,43 @@ class CadastroPessoaController extends AbstractController
             $pessoa->setEstado($request->request->get('estado'));
             
             $entityManagerInterface->persist($pessoa);
+            $entityManagerInterface->flush();
+
+           return $this->json("Success: 'True'");
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+    }
+
+    /**
+     * @Route("/ListarPessoas", name="ListarPessoas")
+     */
+    public function ListPessoas(PessoaRepository $pessoaRepository): Response
+    {
+        $data['titulo'] = 'Listar Pessoas';
+        try
+        {
+           $data['pessoas'] = $pessoaRepository->findAll();
+        }
+        catch(Exception $exception)
+        {
+            return $this->json($exception->getMessage());
+        }
+
+        return $this->renderForm('Pessoa/ListarPessoa.html.twig', $data);
+    }
+
+    /**
+     * @Route("/Delete/{id}", name="Create")
+     */
+    public function Delete(int $id, EntityManagerInterface $entityManagerInterface, PessoaRepository $pessoaRepository) : Response
+    {
+        try
+        {
+            $categoria = $pessoaRepository->find($id);
+            $entityManagerInterface->remove($categoria);
             $entityManagerInterface->flush();
 
            return $this->json("Success: 'True'");
