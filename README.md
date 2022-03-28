@@ -13,7 +13,6 @@ Project developed in <b>Symfony 5.4</b>
 * You need to have PHP installed on your machine.
 * You need to have a mysql server running on your machine and run the database creation script.
 * Install the dependencies and start the server:
-  * symfony new desafio_Lucas --version=5.4
   * composer require annotations
   * composer require twig
   * composer require symfony/orm-pack
