@@ -11,7 +11,7 @@ Project developed in <b>Symfony 5.4</b>
 * Firstly, you need to clone this repository:
 * git clone https://github.com/lucasmartins098/desafio_Lucas.git
 * You need to have PHP installed on your machine.
-* You need to have a mysql server running on your machine and run the database creation script.
+* You need to have a mysql server running on your machine and run the database creation script, you can find the script on path "ScriptMySQL\desafio_pessoa.sql".
 * Install the dependencies and start the server:
   * composer require annotations
   * composer require twig
@@ -19,6 +19,7 @@ Project developed in <b>Symfony 5.4</b>
     * a message will appear asking yes or no, type "y" and proceed
   * composer require doctrine maker
   * composer require symfony/form
+  * You must change the .env file to access the database according to your local settings.
   * symfony server:start
   
   * Now you can acess on http://localhost:8000
