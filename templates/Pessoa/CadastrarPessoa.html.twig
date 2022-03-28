@@ -1,53 +1,57 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Página Inicial
+{% block title %}Cadastrar Pessoas
 {% endblock %}
 
 {% block body %}
-	<h1>
-		Olá
-	</h1>
 
-    <form id='form' >
-</br>
-        <label>Nome:</label>
-        <input type="text" id="nome">
+	<div class="container">
+       <h1> Cadastrar Pessoas</h1>
+    </div>
 
-</br>
-        <label>CPF:</label>
-        <input type="text" id="cpf">
+<div class="panel panel-default container">
+        <div class="panel-body">
+            <form id='form' >
+                <label>Nome:</label>
+                <input type="text" id="nome" class="form-control">
+                <br>
 
-</br>
-        <label>Data de Nascimento</label>
-        <input type="text" id="dataNascimento">
+                <label>CPF:</label>
+                <input type="text" id="cpf" class="form-control">
+                <br>
 
-</br>
-        <label>Email</label>
-        <input type="text" id="email">
+                <label>Data de Nascimento</label>
+                <input type="text" id="dataNascimento" class="form-control" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
+                <br>
 
-</br>
-        <label>Telefone</label>        
-        <input type="text" id="telefone">
+                <label>Email</label>
+                <input type="text" id="email" class="form-control">
+                <br>
 
-</br>
-        <label>Logradouro</label>        
-        <input type="text" id="logradouro">
+                <label>Telefone</label>        
+                <input type="text" id="telefone" class="form-control">
+                <br>
 
-</br>
-        <label>Estado</label>
-        <select id="estado" onchange="BuscarMunicipios()">
-        </select>
+                <label>Logradouro</label>        
+                <input type="text" id="logradouro" class="form-control">
+                <br>
 
-</br>
-        <label>Cidade</label>
-         <select id="cidade">
-        </select>
+                <label>Estado</label>
+                <select id="estado" onchange="BuscarMunicipios()" class="form-control">
+                    <option>Selecione uma opção</option>
+                </select>
+                <br>
 
-</br>
-        <input type="button" onclick="Enviar()" value="Enviar">
+                <label>Cidade</label>
+                <select id="cidade" class="form-control">
+                </select>
+                <br>
+                <input type="button" onclick="Enviar()" id="buttonEnviar" value="Enviar" class="btn btn-success">
+                <br>
 
-    </form>
-
+            </form>
+        </div>
+</div>
     
     {% endblock %}
     {% block javascript %}
@@ -57,6 +61,7 @@
   <script type="text/javascript">
 
     function Enviar() {
+        $("#buttonEnviar").attr("disabled", true);
         var nome = $("#nome").val();
         var cpf = $("#cpf").val();
         var dataNascimento = $("#dataNascimento").val();
@@ -66,6 +71,29 @@
         var cidade = $("#cidade").val();
         var estado = $( "#estado option:selected" ).text();
 
+        data = new Date(dataNascimento);
+        dataFormatada = data.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+
+        if(nome == "" || cpf == "" || dataNascimento == "" || email == "" || telefone == "" || logradouro == "" || cidade == "" || estado == "")
+        {
+            swal("Erro no preenchimento.", "Todos campos são obrigatórios.", "error");
+            $("#buttonEnviar").attr("disabled", false);
+            return false;
+        }
+
+        if(cpf.length != 14){
+            swal("Erro no preenchimento.", "O campo CPF está em formato incorreto.", "error");
+            $("#buttonEnviar").attr("disabled", false);
+            return false;
+        }
+
+        if(telefone.length < 13 || telefone.length > 14)
+        {
+            swal("Erro no preenchimento.", "O campo Telefone está em formato incorreto.", "error");
+            $("#buttonEnviar").attr("disabled", false);
+            return false;   
+        }
+
                 $.ajax({  
                     type: "POST",  
                     url: '/Create',
@@ -73,7 +101,7 @@
                         nome: nome,
                         cpf: cpf,
                         email: email,
-                        dataNascimento:dataNascimento,
+                        dataNascimento: dataFormatada,
                         telefone: telefone,
                         logradouro:logradouro,
                         cidade: cidade,
@@ -81,12 +109,38 @@
                     },
                     success: function(response)
                     {
-                        console.log(response);
+                        var resposta = JSON.parse(response);
+                        if(resposta.retorno.success){
+                            swal({
+                                title: "Bom trabalho.",
+                                text: "Pessoa cadastrada com sucesso, deseja retornar ao menu principal?",
+                                icon: "success",
+                                buttons: true,
+                                dangerMode: false,
+                                confirmButtonText: "Sim",
+                                cancelButtonText: "Não",
+                            })
+                            .then((ok) => {
+                                if (ok) {
+                                    window.location.href = "/";
+                                } else {
+                                    swal("Ok, você continuará na tela de cadastros de novas pessoas.");
+                                }
+                            });
+
+                            $("#buttonEnviar").attr("disabled", false);
+                            
+                            }
                     }
                 });
         }
 
         $(document).ready(function() {
+            $("#dataNascimento").mask("99/99/9999");
+            $("#telefone");
+            $('#telefone').mask('(00) 000000000');
+            var campoCpf = $("#cpf");
+            campoCpf.mask('000.000.000-00', {reverse: true});
             BuscarEstados();
         });
 
@@ -99,9 +153,9 @@
             fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados/"+ estadoId +"/municipios")
                 .then( res => res.json())
                 .then( municipios => {
-                for( const municipio of municipios ) {
-                    municipioSelect.innerHTML += `<option value="${municipio.nome}">${municipio.nome}</option>`
-                }
+                    for( const municipio of municipios ) {
+                        municipioSelect.innerHTML += `<option value="${municipio.nome}">${municipio.nome}</option>`
+                    }
                 });
         }
 
@@ -112,9 +166,9 @@
             fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome")
                 .then( res => res.json())
                 .then( estados => {
-                for( const estado of estados ) {
-                    ufSelect.innerHTML += `<option value="${estado.id}">${estado.nome}</option>`
-                }
+                    for( const estado of estados ) {
+                        ufSelect.innerHTML += `<option value="${estado.id}">${estado.nome}</option>`
+                    }
                 });
         }
 
