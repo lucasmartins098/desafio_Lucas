@@ -68,7 +68,6 @@
 
   <script type="text/javascript">
 
-
      function DeletarPessoa(id){
 
                 swal({
@@ -117,6 +116,9 @@
         var cidade = $("#cidade").val();
         var estado = $( "#estado option:selected" ).text();
 
+        data = new Date(dataNascimento);
+        dataFormatada = data.toLocaleDateString('pt-BR', {timeZone: 'UTC'});
+
                 $.ajax({  
                     type: "POST",  
                     url: '/Update/'+{{pessoa.Id}},
@@ -124,7 +126,7 @@
                         nome: nome,
                         cpf: cpf,
                         email: email,
-                        dataNascimento: dataNascimento,
+                        dataNascimento: dataFormatada,
                         telefone: telefone,
                         logradouro:logradouro,
                         cidade: cidade,
@@ -132,26 +134,26 @@
                     },
                     success: function(response)
                     {
-                        if(response == "Success: 'True'"){
+                        var resposta = JSON.parse(response);
+                        if(resposta.retorno.success){
+                                swal({
+                                        title: "Bom trabalho.",
+                                        text: "Pessoa editada com sucesso, deseja retornar ao menu principal?",
+                                        icon: "success",
+                                        buttons: true,
+                                        dangerMode: false,
+                                        confirmButtonText: "Sim",
+                                        cancelButtonText: "Não",
+                                })
+                                .then((ok) => {
+                                        if (ok) {
+                                                window.location.href = "/";
+                                        } else {
+                                                swal("Ok, você continuará na tela de edição dessa pessoa.");
+                                        }
+                                });
 
-                            swal({
-                            title: "Bom trabalho.",
-                            text: "Pessoa editada com sucesso, deseja retornar ao menu principal?",
-                            icon: "success",
-                            buttons: true,
-                            dangerMode: false,
-                            confirmButtonText: "Sim",
-                            cancelButtonText: "Não",
-                            })
-                            .then((ok) => {
-                            if (ok) {
-                                window.location.href = "/";
-                            } else {
-                                swal("Ok, você continuará na tela de edição dessa pessoa.");
-                            }
-                            });
-
-                            $("#buttonEnviar").attr("disabled", false);
+                                $("#buttonEnviar").attr("disabled", false);
                             
                             }
                     }
@@ -159,6 +161,11 @@
         }
 
         $(document).ready(function() {
+            $("#dataNascimento").mask("99/99/9999");
+            $("#telefone");
+            $('#telefone').mask('(00) 000000000');
+            var campoCpf = $("#cpf");
+            campoCpf.mask('000.000.000-00', {reverse: true});                 
             BuscarEstados();
         });
 
@@ -171,9 +178,9 @@
             fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados/"+ estadoId +"/municipios")
                 .then( res => res.json())
                 .then( municipios => {
-                for( const municipio of municipios ) {
-                    municipioSelect.innerHTML += `<option value="${municipio.nome}">${municipio.nome}</option>`
-                }
+                        for( const municipio of municipios ) {
+                        municipioSelect.innerHTML += `<option value="${municipio.nome}">${municipio.nome}</option>`
+                        }
                 });
         }
 
@@ -184,9 +191,9 @@
             fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome")
                 .then( res => res.json())
                 .then( estados => {
-                for( const estado of estados ) {
-                    ufSelect.innerHTML += `<option value="${estado.id}">${estado.nome}</option>`
-                }
+                        for( const estado of estados ) {
+                        ufSelect.innerHTML += `<option value="${estado.id}">${estado.nome}</option>`
+                        }
                 });
         }
 
