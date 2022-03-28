@@ -15,7 +15,7 @@ Project developed in <b>Symfony 5.4</b>
 * Install the dependencies and start the server:
   * You must have scoop installed on your computer to run the command "scoop install symfony-cli"
   * with cmd inside the project folder you must run the following commands: 
-   * composer update
+   * composer install
    * composer require annotations
    * composer require twig
    * composer require symfony/orm-pack
